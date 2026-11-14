@@ -22,11 +22,11 @@ const phones = [
 
     <div class="tear-tabs-container">
       {phones.map((phone) => (
-        <div class="tear-tab" data-phone={phone} title="Clic para arrancar y llamar">
+        <button type="button" class="tear-tab" data-phone={phone} title="Copiar teléfono y elegir si abrir WhatsApp">
           <i class="fa-brands fa-whatsapp"></i>
           <span class="tear-phone">{phone}</span>
           <span class="tear-action-hint">Arrancar</span>
-        </div>
+        </button>
       ))}
     </div>
   </div>

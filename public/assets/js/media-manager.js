@@ -64,6 +64,20 @@ class MediaManager {
   }
 
   initEvents() {
+    for (const zone of [this.bannerDropzone, this.videoDropzone]) {
+      zone?.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); zone.click(); }
+      });
+    }
+    this.modalOverlay?.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { this.closeModal(); return; }
+      if (event.key !== 'Tab') return;
+      const focusable = [...this.modalOverlay.querySelectorAll('button, input, select, textarea, [tabindex="0"]')].filter(el => el.getClientRects().length && !el.disabled);
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    });
     // Controles de Slider
     if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.prevSlide());
     if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.nextSlide());
@@ -146,7 +160,8 @@ class MediaManager {
   loadBanners() {
     try {
       const stored = localStorage.getItem(this.storageKeyBanners);
-      return stored ? JSON.parse(stored) : [...DEFAULT_BANNERS];
+      const parsed = stored ? JSON.parse(stored) : DEFAULT_BANNERS;
+      return Array.isArray(parsed) ? parsed.filter(item => item && typeof item.title === 'string' && ValorSafety.imageURL(item.imageUrl)).slice(0, 20) : [...DEFAULT_BANNERS];
     } catch (e) {
       return [...DEFAULT_BANNERS];
     }
@@ -155,15 +170,18 @@ class MediaManager {
   saveBanners() {
     try {
       localStorage.setItem(this.storageKeyBanners, JSON.stringify(this.banners));
+      return true;
     } catch (e) {
-      console.warn("Storage full or unavailable", e);
+      alert('No se pudo guardar en este navegador. Liberá espacio o usá un archivo más pequeño.');
+      return false;
     }
   }
 
   loadVideos() {
     try {
       const stored = localStorage.getItem(this.storageKeyVideos);
-      return stored ? JSON.parse(stored) : [...DEFAULT_VIDEOS];
+      const parsed = stored ? JSON.parse(stored) : DEFAULT_VIDEOS;
+      return Array.isArray(parsed) ? parsed.filter(item => item && typeof item.title === 'string' && ValorSafety.videoURL(item.url)).slice(0, 20) : [...DEFAULT_VIDEOS];
     } catch (e) {
       return [...DEFAULT_VIDEOS];
     }
@@ -172,8 +190,10 @@ class MediaManager {
   saveVideos() {
     try {
       localStorage.setItem(this.storageKeyVideos, JSON.stringify(this.videos));
+      return true;
     } catch (e) {
-      console.warn("Storage full or unavailable", e);
+      alert('No se pudo guardar en este navegador. Liberá espacio o usá un archivo más pequeño.');
+      return false;
     }
   }
 
@@ -202,18 +222,20 @@ class MediaManager {
     this.banners.forEach((banner, index) => {
       const slide = document.createElement('div');
       slide.className = `slide ${index === 0 ? 'active' : ''}`;
-      slide.style.backgroundImage = `url('${banner.imageUrl}')`;
+      slide.inert = index !== 0;
+      slide.setAttribute('aria-hidden', String(index !== 0));
+      slide.style.backgroundImage = `url('${ValorSafety.imageURL(banner.imageUrl)}')`;
 
       slide.innerHTML = `
         <div class="slide-overlay"></div>
         <div class="container">
           <div class="slide-content">
-            <span class="slide-badge">${banner.tag || 'VALOR Y ASOCIADOS'}</span>
-            <h2 class="slide-title">${banner.title}</h2>
-            <p class="slide-subtitle">${banner.subtitle}</p>
+            <span class="slide-badge">${ValorSafety.escapeHTML(banner.tag || 'VALOR Y ASOCIADOS')}</span>
+            <h2 class="slide-title">${ValorSafety.escapeHTML(banner.title)}</h2>
+            <p class="slide-subtitle">${ValorSafety.escapeHTML(banner.subtitle)}</p>
             <div class="slide-actions">
-              <a href="${banner.linkTarget || '#contacto'}" class="btn btn-gold">
-                ${banner.buttonText || 'Consultar Caso'} <i class="fa-solid fa-arrow-right"></i>
+              <a href="${banner.linkTarget === '#areas' ? '#areas' : '#contacto'}" class="btn btn-gold">
+                ${ValorSafety.escapeHTML(banner.buttonText || 'Consultar Caso')} <i class="fa-solid fa-arrow-right"></i>
               </a>
               <button class="btn btn-outline" onclick="window.chatbotInstance && window.chatbotInstance.toggleWindow()" style="border-color: #fff; color: #fff;">
                 <i class="fa-solid fa-comment-dots"></i> Asistente Virtual
@@ -242,11 +264,13 @@ class MediaManager {
 
     if (!slides.length) return;
 
-    slides.forEach(s => s.classList.remove('active'));
+    slides.forEach(s => { s.classList.remove('active'); s.inert = true; s.setAttribute('aria-hidden', 'true'); });
     dots.forEach(d => d.classList.remove('active'));
 
     this.currentSlideIndex = (index + slides.length) % slides.length;
     slides[this.currentSlideIndex].classList.add('active');
+    slides[this.currentSlideIndex].inert = false;
+    slides[this.currentSlideIndex].setAttribute('aria-hidden', 'false');
     if (dots[this.currentSlideIndex]) {
       dots[this.currentSlideIndex].classList.add('active');
     }
@@ -264,9 +288,7 @@ class MediaManager {
 
   startAutoSlider() {
     clearInterval(this.sliderTimer);
-    this.sliderTimer = setInterval(() => {
-      this.nextSlide();
-    }, 6000);
+    // Navegación manual: evita movimiento automático y lectura interrumpida.
   }
 
   // --- RENDERIZADO DE VIDEOS ---
@@ -289,52 +311,75 @@ class MediaManager {
       card.className = 'video-card';
 
       // Si es YouTube embed o video local
-      const isEmbed = video.url.includes('youtube.com') || video.url.includes('youtu.be') || video.url.includes('embed');
+      const safeURL = ValorSafety.videoURL(video.url);
+      if (!safeURL) return;
+      const isEmbed = safeURL.startsWith('https://www.youtube-nocookie.com/embed/');
 
       card.innerHTML = `
         <div class="video-thumb-wrap">
           ${isEmbed ? `
-            <iframe src="${video.url}" title="${video.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>
+            <button type="button" class="btn btn-outline video-load" data-video="${safeURL}">Cargar video de YouTube (servicio externo)</button>
           ` : `
-            <video controls poster="${video.thumbnail || ''}" style="width: 100%; height: 100%; object-fit: cover;">
-              <source src="${video.url}" type="video/mp4">
+            <video controls preload="none" poster="${ValorSafety.escapeHTML(ValorSafety.imageURL(video.thumbnail))}" style="width: 100%; height: 100%; object-fit: cover;">
+              <source src="${ValorSafety.escapeHTML(safeURL)}" type="${safeURL.startsWith('data:video/webm;') ? 'video/webm' : 'video/mp4'}">
               Tu navegador no soporta el formato de video.
             </video>
           `}
         </div>
         <div class="video-info">
-          <span class="video-category">${video.category || 'Asesoramiento Legal'}</span>
-          <h4 class="video-title">${video.title}</h4>
-          <p class="video-desc">${video.description || ''}</p>
+          <span class="video-category">${ValorSafety.escapeHTML(video.category || 'Información general')}</span>
+          <h3 class="video-title">${ValorSafety.escapeHTML(video.title)}</h3>
+          <p class="video-desc">${ValorSafety.escapeHTML(video.description)}</p>
           <a href="#contacto" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px 14px; align-self: flex-start;">
             <i class="fa-solid fa-scale-balanced"></i> Consultar sobre este tema
           </a>
         </div>
       `;
 
+      const loadButton = card.querySelector('.video-load');
+      if (loadButton) loadButton.addEventListener('click', () => {
+        const frame = document.createElement('iframe');
+        frame.src = safeURL;
+        frame.title = video.title;
+        frame.loading = 'lazy';
+        frame.referrerPolicy = 'no-referrer';
+        frame.allowFullscreen = true;
+        frame.style.cssText = 'width:100%;height:100%;border:0';
+        loadButton.replaceWith(frame);
+        frame.focus();
+      });
       this.videosGrid.appendChild(card);
     });
   }
 
   // --- ADMIN PANEL Y CARGA DE BANNERS ---
   openModal() {
+    if (!this.modalOverlay) return;
+    this.previousFocus = document.activeElement;
     this.modalOverlay.classList.add('open');
+    this.modalClose.focus();
   }
 
   closeModal() {
     this.modalOverlay.classList.remove('open');
+    this.previousFocus?.focus();
   }
 
   handleBannerFile(e) {
     const file = e.target.files[0];
     if (!file) return;
+    this.tempBannerImageBase64 = null;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024) {
+      alert('Elegí JPG, PNG o WebP de hasta 2 MB.');
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (loadEvent) => {
       this.tempBannerImageBase64 = loadEvent.target.result;
       this.bannerDropzone.innerHTML = `
         <img src="${this.tempBannerImageBase64}" style="max-height: 120px; margin: 0 auto 10px auto; border-radius: 6px;" />
-        <p style="font-size: 0.85rem; color: #1a6b33; font-weight: 700;">✓ Imagen seleccionada: ${file.name}</p>
+        <p style="font-size: 0.85rem; color: #1a6b33; font-weight: 700;">✓ Imagen seleccionada: ${ValorSafety.escapeHTML(file.name)}</p>
         <span style="font-size: 0.75rem; color: var(--text-muted);">Clic para cambiar</span>
       `;
     };
@@ -362,7 +407,7 @@ class MediaManager {
     };
 
     this.banners.unshift(newBanner);
-    this.saveBanners();
+    if (!this.saveBanners()) { this.banners.shift(); return; }
     this.renderSlider();
     this.renderAdminLists();
 
@@ -377,13 +422,14 @@ class MediaManager {
       <p style="font-size: 0.85rem; color: var(--text-muted);">o haz clic para explorar tus archivos (JPG, PNG, WebP)</p>
     `;
 
-    alert("¡Banner cargado con éxito y publicado en el slider!");
+    alert('Banner guardado solo en este navegador. No se publicó en un servidor.');
   }
 
   deleteBanner(bannerId) {
     if (confirm("¿Estás seguro de eliminar este banner?")) {
+      const previous = this.banners;
       this.banners = this.banners.filter(b => b.id !== bannerId);
-      this.saveBanners();
+      if (!this.saveBanners()) { this.banners = previous; return; }
       this.renderSlider();
       this.renderAdminLists();
     }
@@ -393,13 +439,18 @@ class MediaManager {
   handleVideoFile(e) {
     const file = e.target.files[0];
     if (!file) return;
+    this.tempVideoBase64 = null;
+    if (!['video/mp4', 'video/webm'].includes(file.type) || file.size > 2 * 1024 * 1024) {
+      alert('Elegí MP4 o WebM de hasta 2 MB para esta demo local.');
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (loadEvent) => {
       this.tempVideoBase64 = loadEvent.target.result;
       this.videoDropzone.innerHTML = `
         <i class="fa-solid fa-circle-check" style="color: #25d366; font-size: 2.2rem;"></i>
-        <p style="font-size: 0.88rem; font-weight: 700; color: #1b6330;">Video cargado: ${file.name}</p>
+        <p style="font-size: 0.88rem; font-weight: 700; color: #1b6330;">Video cargado: ${ValorSafety.escapeHTML(file.name)}</p>
         <span style="font-size: 0.75rem; color: var(--text-muted);">Clic para reemplazar</span>
       `;
     };
@@ -430,18 +481,20 @@ class MediaManager {
       videoUrl = `https://www.youtube.com/embed/${id}`;
     }
 
+    const safeURL = ValorSafety.videoURL(this.tempVideoBase64 || videoUrl);
+    if (!safeURL) { alert('Usá un enlace HTTPS de YouTube válido o un video MP4/WebM.'); return; }
     const newVideo = {
       id: `video-${Date.now()}`,
       title,
       category,
       description: desc,
       type: this.tempVideoBase64 ? 'local' : 'youtube',
-      url: this.tempVideoBase64 || videoUrl,
+      url: safeURL,
       thumbnail: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80'
     };
 
     this.videos.unshift(newVideo);
-    this.saveVideos();
+    if (!this.saveVideos()) { this.videos.shift(); return; }
     this.renderVideos();
     this.renderAdminLists();
 
@@ -456,13 +509,14 @@ class MediaManager {
       <p style="font-size: 0.85rem; color: var(--text-muted);">o haz clic para subir un video de tus archivos</p>
     `;
 
-    alert("¡Video agregado con éxito a la galería!");
+    alert('Video guardado solo en este navegador. No se publicó en un servidor.');
   }
 
   deleteVideo(videoId) {
     if (confirm("¿Estás seguro de eliminar este video?")) {
+      const previous = this.videos;
       this.videos = this.videos.filter(v => v.id !== videoId);
-      this.saveVideos();
+      if (!this.saveVideos()) { this.videos = previous; return; }
       this.renderVideos();
       this.renderAdminLists();
     }
@@ -478,16 +532,17 @@ class MediaManager {
         item.className = 'manage-item';
         item.innerHTML = `
           <div class="manage-item-info">
-            <img src="${b.imageUrl}" class="manage-item-thumb" alt="${b.title}">
+            <img src="${ValorSafety.escapeHTML(ValorSafety.imageURL(b.imageUrl))}" class="manage-item-thumb" alt="${ValorSafety.escapeHTML(b.title)}" loading="lazy" width="60" height="60">
             <div class="manage-item-text">
-              <h5>${b.title}</h5>
-              <span>Etiqueta: ${b.tag || 'General'}</span>
+              <h5>${ValorSafety.escapeHTML(b.title)}</h5>
+              <span>Etiqueta: ${ValorSafety.escapeHTML(b.tag || 'General')}</span>
             </div>
           </div>
-          <button class="btn btn-outline" style="color: #e63946; border-color: #e63946; padding: 4px 10px; font-size: 0.8rem;" onclick="window.mediaManagerInstance.deleteBanner('${b.id}')">
+          <button class="btn btn-outline" aria-label="Eliminar banner local" style="color: #e63946; border-color: #e63946; padding: 4px 10px; font-size: 0.8rem;">
             <i class="fa-solid fa-trash"></i>
           </button>
         `;
+        item.querySelector('button').addEventListener('click', () => this.deleteBanner(b.id));
         this.adminBannersList.appendChild(item);
       });
     }
@@ -504,14 +559,15 @@ class MediaManager {
               <i class="fa-solid fa-play"></i>
             </div>
             <div class="manage-item-text">
-              <h5>${v.title}</h5>
-              <span>${v.category}</span>
+              <h5>${ValorSafety.escapeHTML(v.title)}</h5>
+              <span>${ValorSafety.escapeHTML(v.category)}</span>
             </div>
           </div>
-          <button class="btn btn-outline" style="color: #e63946; border-color: #e63946; padding: 4px 10px; font-size: 0.8rem;" onclick="window.mediaManagerInstance.deleteVideo('${v.id}')">
+          <button class="btn btn-outline" aria-label="Eliminar video local" style="color: #e63946; border-color: #e63946; padding: 4px 10px; font-size: 0.8rem;">
             <i class="fa-solid fa-trash"></i>
           </button>
         `;
+        item.querySelector('button').addEventListener('click', () => this.deleteVideo(v.id));
         this.adminVideosList.appendChild(item);
       });
     }

@@ -2,11 +2,13 @@
 interface Props {
   title?: string;
   description?: string;
+  interactive?: boolean;
 }
 
 const { 
   title = "Estudio Jurídico Valor y Asociados | Asesoramiento y Representación Legal en Argentina",
-  description = "Estudio Jurídico Valor y Asociados. Asesoramiento y representación legal en Área Penal, Civil, y Jubilados y Pensionados. Sedes en CABA, Tucumán y Santiago del Estero. Tu tranquilidad, nuestra prioridad."
+  description = "Estudio Jurídico Valor y Asociados. Áreas de práctica y canales de contacto. Demo institucional.",
+  interactive = true
 } = Astro.props;
 ---
 
@@ -27,13 +29,19 @@ const {
   
   <!-- Meta SEO -->
   <meta name="description" content={description} />
-  <meta name="keywords" content="abogados argentina, estudio juridico valor y asociados, abogado penalista, sucesiones, accidentes, jubilados descuentos anses, caba, tucuman, santiago del estero" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="referrer" content="no-referrer" />
   <meta name="author" content="Valor y Asociados" />
 
   <!-- Open Graph -->
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
+  <meta property="og:locale" content="es_AR" />
+  <meta property="og:site_name" content="Valor y Asociados" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
 
   <!-- Google Fonts: Plus Jakarta Sans, Inter, JetBrains Mono (Artificial Analysis Style) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -45,12 +53,16 @@ const {
   <link rel="stylesheet" href="/assets/css/styles.css" />
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
   <slot />
 
   <!-- Scripts del motor interactivo y ofuscado -->
-  <script is:inline src="/assets/js/data.js"></script>
-  <script is:inline src="/assets/js/chatbot.js"></script>
-  <script is:inline src="/assets/js/media-manager.js"></script>
-  <script is:inline src="/assets/js/main.js"></script>
+  {interactive && <>
+    <script is:inline defer src="/assets/js/safety.js"></script>
+    <script is:inline defer src="/assets/js/data.js"></script>
+    <script is:inline defer src="/assets/js/chatbot.js"></script>
+    <script is:inline defer src="/assets/js/media-manager.js"></script>
+    <script is:inline defer src="/assets/js/main.js"></script>
+  </>}
 </body>
 </html>

@@ -17,6 +17,8 @@ import AdminModal from '../components/AdminModal.astro';
 <Layout>
   <Topbar />
   <Navbar />
+  <main id="main-content" tabindex="-1">
+  <p class="demo-notice">Demo de presentación. No ingreses datos personales ni información de un caso real.</p>
   <HeroSlider />
   <Pillars />
   <PracticeAreas />
@@ -29,13 +31,13 @@ import AdminModal from '../components/AdminModal.astro';
         CONSULTÁ TU CASO EN LÍNEA
       </h2>
       <p style="font-size: 1.1rem; max-width: 650px; margin: 0 auto 30px auto; color: rgba(255,255,255,0.9);">
-        Elegí tu provincia, contanos brevemente lo sucedido y recibí la respuesta inmediata de nuestros abogados u operadores.
+        Elegí tu provincia y el área de consulta para conocer los canales de contacto. La disponibilidad de atención debe confirmarse con el estudio.
       </p>
       <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
-        <a href="https://wa.me/5491134614115?text=Hola%2C%20quisiera%20consultar%20mi%20caso%20con%20Valor%20y%20Asociados" target="_blank" class="btn btn-whatsapp" style="font-size: 1.05rem; padding: 14px 30px;">
+        <a href="https://wa.me/5491134614115?text=Hola%2C%20quisiera%20consultar%20mi%20caso%20con%20Valor%20y%20Asociados" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" style="font-size: 1.05rem; padding: 14px 30px;">
           <i class="fa-brands fa-whatsapp"></i> WhatsApp CABA (11 3461-4115)
         </a>
-        <a href="https://wa.me/5493815736202?text=Hola%2C%20quisiera%20consultar%20mi%20caso%20con%20Valor%20y%20Asociados" target="_blank" class="btn btn-whatsapp" style="font-size: 1.05rem; padding: 14px 30px;">
+        <a href="https://wa.me/5493815736202?text=Hola%2C%20quisiera%20consultar%20mi%20caso%20con%20Valor%20y%20Asociados" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" style="font-size: 1.05rem; padding: 14px 30px;">
           <i class="fa-brands fa-whatsapp"></i> WhatsApp Tucumán / NOA (381 573-6202)
         </a>
       </div>
@@ -46,6 +48,7 @@ import AdminModal from '../components/AdminModal.astro';
   <ConsultationForm />
   <Sedes />
   <TearStrip />
+  </main>
   <Footer />
 
   <Chatbot />

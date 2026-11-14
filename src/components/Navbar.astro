@@ -1,7 +1,7 @@
 ---
 // Componente Navbar Principal con Branding
 ---
-<nav class="navbar">
+<nav class="navbar" aria-label="Navegación principal">
   <div class="container">
     <a href="#" class="brand-link">
       <div class="brand-icon">
@@ -27,8 +27,8 @@
       </a>
     </div>
 
-    <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir menú">
-      <i class="fa-solid fa-bars"></i>
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir menú" aria-controls="navLinks" aria-expanded="false">
+      <span class="control-symbol" aria-hidden="true">☰</span>
     </button>
   </div>
 </nav>

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Demo: noindex en HTML y X-Robots-Tag. Permitir rastreo de esas directivas.
+# Sin sitemap hasta confirmar dominio y autorizar la indexación.

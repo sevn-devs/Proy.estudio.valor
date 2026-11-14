@@ -4,11 +4,13 @@
   "description": "Landing Page Estudio Jurídico Valor y Asociados - Powered by Astro",
   "type": "module",
   "scripts": {
-    "dev": "astro dev --host",
+    "dev": "astro dev",
     "build": "astro build",
     "start": "node server.js",
     "preview": "astro preview",
-    "obfuscate": "node obfuscator.cjs"
+    "obfuscate": "node obfuscator.cjs",
+    "test": "node --test tests/*.test.mjs",
+    "collect": "node sven-brain/collect.mjs"
   },
   "dependencies": {
     "astro": "^5.0.0"

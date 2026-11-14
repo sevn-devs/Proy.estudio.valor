@@ -2,7 +2,9 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Figma Prototype Mockup - Estudio Jurídico Valor y Asociados">
+<Layout title="Prototipo visual - Estudio Jurídico Valor y Asociados" interactive={false}>
+  <main id="main-content" tabindex="-1">
   <!-- Contenedor embebido de Figma Mockup -->
   <iframe src="/mockup.html" style="width: 100vw; height: 100vh; border: none; display: block;" title="Figma Mockup"></iframe>
+  </main>
 </Layout>

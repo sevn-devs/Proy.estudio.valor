@@ -3,7 +3,7 @@
 ---
 <div class="chatbot-widget" id="chatbotWidget">
   <!-- Ventana de Chat -->
-  <div class="chatbot-window" id="chatbotWindow">
+  <div class="chatbot-window" id="chatbotWindow" role="dialog" aria-labelledby="chatbotTitle" hidden>
     <div class="chatbot-header">
       <div class="chatbot-header-info">
         <div class="chatbot-avatar">
@@ -11,34 +11,37 @@
           <span class="status-dot"></span>
         </div>
         <div class="chatbot-title">
-          <h4>Asistente Valor & Asoc.</h4>
-          <span>En línea • Jurisdicción Argentina</span>
+          <h2 id="chatbotTitle">Asistente Valor & Asoc.</h2>
+          <span>Recorrido guiado • Demo</span>
         </div>
       </div>
       <div class="chatbot-actions">
         <button class="chat-btn-icon" id="chatbotClose" aria-label="Cerrar chat">
-          <i class="fa-solid fa-xmark"></i>
+          <span class="control-symbol" aria-hidden="true">×</span>
         </button>
       </div>
     </div>
 
-    <div class="chatbot-messages" id="chatbotMessages">
+    <div class="chatbot-messages" id="chatbotMessages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversación guiada">
       <!-- Mensajes inyectados dinámicamente -->
     </div>
 
     <div class="chatbot-footer">
       <div class="chatbot-input-row">
-        <input type="text" id="chatbotInput" class="chatbot-input" placeholder="Escribí tu consulta o duda..." />
+        <label for="chatbotInput" class="sr-only">Área o provincia, sin datos personales</label>
+        <input type="text" id="chatbotInput" class="chatbot-input" maxlength="120" autocomplete="off" placeholder="Área o provincia, sin datos personales" />
         <button id="chatbotSend" class="chatbot-send-btn" aria-label="Enviar">
-          <i class="fa-solid fa-paper-plane"></i>
+          <span class="control-symbol" aria-hidden="true">→</span>
         </button>
       </div>
+      <p class="chatbot-disclaimer">No reemplaza a un profesional. No ingreses detalles de un caso real.</p>
+      <button type="button" id="chatbotReset" class="chat-option-btn">Borrar conversación y reiniciar</button>
     </div>
   </div>
 
   <!-- Gatillador Flotante -->
-  <button class="chatbot-trigger" id="chatbotTrigger" aria-label="Abrir asistente legal">
-    <i class="fa-solid fa-comment-dots"></i>
+  <button class="chatbot-trigger" id="chatbotTrigger" aria-label="Abrir asistente legal" aria-controls="chatbotWindow" aria-expanded="false">
+    <span class="control-symbol" aria-hidden="true">💬</span>
     <span class="chatbot-badge-alert" id="chatbotBadge">1</span>
   </button>
 </div>

@@ -1,94 +1,39 @@
 ---
 import { ARGENTINA_PROVINCIAS } from '../data/legalData.js';
 ---
-
 <section class="consultation-section" id="contacto">
-  <div class="container">
-    <div class="consultation-grid">
-      <div class="consultation-info">
-        <span class="section-tag" style="color: var(--accent-gold-light);">Innovación Legal en Argentina</span>
-        <h2>Elegí tu Provincia y Cargá tu Consulta</h2>
-        <p>
-          No importa en qué rincón del país te encuentres: contamos con abogados matriculados y articulación judicial en las 24 provincias argentinas para responderte con inmediatez.
-        </p>
-
-        <ul class="benefits-list">
-          <li class="benefit-item">
-            <div class="benefit-icon"><i class="fa-solid fa-bolt"></i></div>
-            <div class="benefit-text">
-              <strong>Respuesta en menos de 15 minutos</strong>
-              <span>Prioridad automática si se trata de allanamientos o detenciones.</span>
-            </div>
-          </li>
-          <li class="benefit-item">
-            <div class="benefit-icon"><i class="fa-solid fa-robot"></i></div>
-            <div class="benefit-text">
-              <strong>Asistente inteligente 24/7</strong>
-              <span>Respuestas básicas al instante y derivación inmediata a operadores humanos.</span>
-            </div>
-          </li>
-          <li class="benefit-item">
-            <div class="benefit-icon"><i class="fa-solid fa-shield-cat"></i></div>
-            <div class="benefit-text">
-              <strong>Análisis de Viabilidad Gratuito</strong>
-              <span>Evaluamos la documentación preliminar de tu reclamo sin costo inicial.</span>
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Card del Formulario -->
-      <div class="consultation-card">
-        <h3>Formulario de Contacto Directo</h3>
-        <p>Completá los datos y serás derivado con el especialista asignado a tu provincia.</p>
-
-        <form id="formConsultaPrincipal">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="consultaNombre">Tu Nombre Completo *</label>
-              <input type="text" id="consultaNombre" class="form-control" placeholder="Ej. Juan Pérez" required />
-            </div>
-            <div class="form-group">
-              <label for="consultaTelefono">Teléfono con WhatsApp *</label>
-              <input type="tel" id="consultaTelefono" class="form-control" placeholder="Ej. 11 2345-6789" required />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="consultaProvincia">Provincia de Argentina *</label>
-              <select id="consultaProvincia" class="form-control" required>
-                <option value="">-- Seleccioná tu Provincia --</option>
-                {ARGENTINA_PROVINCIAS.map((prov) => (
-                  <option value={prov}>{prov}</option>
-                ))}
-              </select>
-              <span class="form-badge-provincia">
-                <i class="fa-solid fa-map-pin"></i> Cobertura en toda la Argentina
-              </span>
-            </div>
-            <div class="form-group">
-              <label for="consultaArea">Área de la Consulta *</label>
-              <select id="consultaArea" class="form-control" required>
-                <option value="">-- Seleccioná el Área --</option>
-                <option value="Área Penal">Área Penal (Denuncias / Defensas)</option>
-                <option value="Área Civil">Área Civil (Accidentes / Sucesiones / Contratos)</option>
-                <option value="Jubilados y Pensionados">Jubilados y Pensionados (Descuentos ANSES / Bancos)</option>
-                <option value="Otra Consulta">Otra Consulta Legal</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="consultaMensaje">Detalle de tu Caso o Consulta *</label>
-            <textarea id="consultaMensaje" class="form-control" placeholder="Describí brevemente lo sucedido, fechas o si recibiste alguna cédula/notificación..." required></textarea>
-          </div>
-
-          <button type="submit" class="btn btn-gold form-submit-btn">
-            <i class="fa-solid fa-paper-plane"></i> Enviar Consulta y Derivar a Operador
-          </button>
-        </form>
-      </div>
+  <div class="container consultation-grid">
+    <div class="consultation-info">
+      <span class="section-tag">Contacto con el estudio</span>
+      <h2>Elegí el área de tu consulta</h2>
+      <p>Este recorrido organiza una consulta inicial. No emite asesoramiento jurídico ni reemplaza a un profesional.</p>
+      <p>No ingreses nombres, teléfonos, documentos ni detalles sensibles. La disponibilidad y las condiciones de atención se confirman con el estudio.</p>
+    </div>
+    <div class="consultation-card">
+      <h3>Preparar el contacto</h3>
+      <p id="consultaPrivacidad">La selección se usa solo en esta página y no se guarda. Al abrir WhatsApp salís del sitio hacia un servicio externo. El mensaje inicial es genérico: no incluye tu provincia, área ni conversación. Podés revisarlo antes de enviarlo.</p>
+      <form id="formConsultaPrincipal" aria-describedby="consultaPrivacidad">
+        <div class="form-group">
+          <label for="consultaProvincia">Provincia *</label>
+          <select id="consultaProvincia" class="form-control" required>
+            <option value="">Seleccioná tu provincia</option>
+            {ARGENTINA_PROVINCIAS.map(prov => <option value={prov}>{prov}</option>)}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="consultaArea">Área de consulta *</label>
+          <select id="consultaArea" class="form-control" required>
+            <option value="">Seleccioná el área</option>
+            <option>Área Penal</option>
+            <option>Área Civil</option>
+            <option>Jubilados y Pensionados</option>
+            <option>Otra Consulta</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-gold form-submit-btn">Revisar canal de contacto</button>
+        <noscript><p>Para preparar la selección activá JavaScript, o usá los enlaces de contacto del pie de página.</p></noscript>
+      </form>
+      <div id="consultaResultado" role="status" aria-live="polite" hidden></div>
     </div>
   </div>
 </section>

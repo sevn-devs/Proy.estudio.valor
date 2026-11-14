@@ -3,16 +3,16 @@
 ---
 <!-- BOTÓN FLOTANTE PARA EL PANEL DE ADMINISTRACIÓN -->
 <button class="admin-trigger-fab" id="adminTriggerFab" title="Panel para cargar y gestionar banners y videos">
-  <i class="fa-solid fa-gear"></i> Cargar Banners & Videos
+  <i class="fa-solid fa-gear"></i> Probar medios en este navegador
 </button>
 
 <!-- MODAL PANEL DE ADMINISTRACIÓN DE MEDIOS -->
 <div class="modal-overlay" id="adminModalOverlay">
-  <div class="modal-container">
+  <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
     <div class="modal-header">
-      <h3><i class="fa-solid fa-sliders"></i> Panel de Carga y Gestión Multimedia</h3>
-      <button id="adminModalClose" class="chat-btn-icon" style="font-size: 1.4rem;">
-        <i class="fa-solid fa-xmark"></i>
+      <h2 id="adminTitle"><i class="fa-solid fa-sliders"></i> Prueba local de medios</h2>
+      <button id="adminModalClose" class="chat-btn-icon" aria-label="Cerrar prueba de medios" style="font-size: 1.4rem;">
+        <span class="control-symbol" aria-hidden="true">×</span>
       </button>
     </div>
 
@@ -26,41 +26,42 @@
     </div>
 
     <div class="modal-body">
+      <p class="demo-notice">Los cambios se guardan solo en este navegador. No se publican ni se comparten con otros dispositivos. No cargues documentación de clientes. Esta demo no es un administrador autenticado.</p>
       <!-- TAB 1: BANNERS -->
       <div class="tab-content active" id="tabContentBanners">
         <h4 style="margin-bottom: 8px;">Cargar Nuevo Banner al Slider</h4>
         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
-          El banner se publicará automáticamente en el carrusel principal de la portada.
+          El banner se mostrará solo en este navegador. Usá imágenes de prueba de hasta 2 MB.
         </p>
 
         <input type="file" id="bannerFileInput" accept="image/*" style="display: none;" />
-        <div class="upload-dropzone" id="bannerDropzone">
+        <div class="upload-dropzone" id="bannerDropzone" role="button" tabindex="0" aria-label="Elegir imagen de banner">
           <i class="fa-solid fa-cloud-arrow-up"></i>
-          <h4>Arrastrá aquí la imagen del Banner</h4>
+          <h4>Elegí una imagen de banner</h4>
           <p style="font-size: 0.85rem; color: var(--text-muted);">o hacé clic para explorar tus archivos (JPG, PNG, WebP)</p>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Título del Banner *</label>
+            <label for="bannerTitle">Título del Banner *</label>
             <input type="text" id="bannerTitle" class="form-control" placeholder="Ej. Abogados Especialistas en Sucesiones" />
           </div>
           <div class="form-group">
-            <label>Etiqueta / Categoría</label>
+            <label for="bannerTag">Etiqueta / Categoría</label>
             <input type="text" id="bannerTag" class="form-control" placeholder="Ej. ÁREA CIVIL" />
           </div>
         </div>
 
         <div class="form-group">
-          <label>Subtítulo o descripción breve</label>
+          <label for="bannerSubtitle">Subtítulo o descripción breve</label>
           <input type="text" id="bannerSubtitle" class="form-control" placeholder="Ej. Soluciones rápidas y asesoramiento transparente." />
         </div>
 
         <button id="btnSaveBanner" class="btn btn-gold" style="width: 100%; margin-bottom: 30px;">
-          <i class="fa-solid fa-plus"></i> Publicar Banner en el Slider
+          <i class="fa-solid fa-plus"></i> Guardar banner en este navegador
         </button>
 
-        <h5 style="margin-bottom: 12px; font-size: 1rem;">Banners Actualmente Publicados</h5>
+        <h5 style="margin-bottom: 12px; font-size: 1rem;">Banners de esta demo local</h5>
         <div class="items-management-list" id="adminBannersList">
           <!-- Listado dinámico -->
         </div>
@@ -70,42 +71,42 @@
       <div class="tab-content" id="tabContentVideos">
         <h4 style="margin-bottom: 8px;">Cargar Nuevo Video Informativo</h4>
         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
-          Podés subir un archivo de video MP4 o pegar un enlace de YouTube.
+          Podés elegir MP4/WebM de hasta 2 MB o un enlace HTTPS de YouTube. Los videos incluidos son muestras pendientes de revisión editorial.
         </p>
 
         <input type="file" id="videoFileInput" accept="video/mp4,video/webm" style="display: none;" />
-        <div class="upload-dropzone" id="videoDropzone">
+        <div class="upload-dropzone" id="videoDropzone" role="button" tabindex="0" aria-label="Elegir video local">
           <i class="fa-solid fa-file-video"></i>
-          <h4>Arrastrá un video MP4 aquí</h4>
+          <h4>Elegí un video de prueba</h4>
           <p style="font-size: 0.85rem; color: var(--text-muted);">o hacé clic para subir un video desde tu equipo</p>
         </div>
 
         <div class="form-group">
-          <label>O ingresar Enlace de YouTube</label>
+          <label for="videoUrl">O ingresar Enlace de YouTube</label>
           <input type="url" id="videoUrl" class="form-control" placeholder="Ej. https://www.youtube.com/watch?v=ScMzIvxBSi4" />
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Título del Video *</label>
+            <label for="videoTitle">Título del Video *</label>
             <input type="text" id="videoTitle" class="form-control" placeholder="Ej. Cómo actuar ante una detención penal" />
           </div>
           <div class="form-group">
-            <label>Categoría</label>
+            <label for="videoCategory">Categoría</label>
             <input type="text" id="videoCategory" class="form-control" placeholder="Ej. Área Penal" />
           </div>
         </div>
 
         <div class="form-group">
-          <label>Descripción corta</label>
+          <label for="videoDesc">Descripción corta</label>
           <textarea id="videoDesc" class="form-control" style="min-height: 60px;" placeholder="Breve resumen de lo que explica el video..."></textarea>
         </div>
 
         <button id="btnSaveVideo" class="btn btn-gold" style="width: 100%; margin-bottom: 30px;">
-          <i class="fa-solid fa-plus"></i> Publicar Video en la Galería
+          <i class="fa-solid fa-plus"></i> Guardar video en este navegador
         </button>
 
-        <h5 style="margin-bottom: 12px; font-size: 1rem;">Videos Actualmente Publicados</h5>
+        <h5 style="margin-bottom: 12px; font-size: 1rem;">Videos de esta demo local</h5>
         <div class="items-management-list" id="adminVideosList">
           <!-- Listado dinámico -->
         </div>
